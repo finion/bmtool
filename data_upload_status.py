@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # coding: UTF-8
 """
 Check the state of the usage data uploaded.

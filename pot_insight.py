@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 """
 Analyze energy usage pattern of pot.
 """

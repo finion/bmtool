@@ -1,0 +1,60 @@
+#!/usr/bin/python
+# coding: UTF-8
+
+"""
+Clone data by three arguments: mac_address, data_start_date and data_end_date.
+"""
+import sys
+import settings
+import AzureUtil
+import azure
+from datetime import timedelta
+
+
+def clone_storage_data(argv):
+    table_service = AzureUtil.AzureUtil().table_service
+    condition = settings.clone_usage_data_azure_storage_condition
+    entities = table_service.query_entities('TableUsageHours',
+                                            condition.format(argv[0],
+                                                             argv[1],
+                                                             argv[2]))
+
+    arr = []
+    for entity in entities:
+        print '{0}, {1}, {2}, {3}, {4}, {5}, {6}'.format(entity.PartitionKey,
+                                                         entity.RowKey,
+                                                         entity.Timestamp,
+                                                         entity.Problem,
+                                                         entity.Time,
+                                                         entity.Voltage,
+                                                         entity.Watt)
+
+        new_time = entity.Time + timedelta(days=8)
+        print entity.Time.strftime('%Y%m%d%H')
+        print new_time.strftime('%Y%m%d%H')
+        arr.append((entity.PartitionKey, new_time.strftime('%Y%m%d%H'), new_time, entity.Voltage, entity.Watt))
+
+    for usage in arr:
+        try:
+            print 'usage length {0}'.format(len(usage))
+            print '{0}, {1}, {2}, {3}, {4}'.format(usage[0],
+                                                   usage[1],
+                                                   usage[2],
+                                                   usage[3],
+                                                   usage[4])
+
+            table_service.insert_entity('TableUsageHours',
+                                        {
+                                            'PartitionKey': usage[0],
+                                            'RowKey': usage[1],
+                                            'Problem': False,
+                                            'Time': usage[2],
+                                            'Voltage': usage[3],
+                                            'Watt': usage[4]
+                                        })
+        except azure.WindowsAzureConflictError:
+            print 'conflict'
+
+
+if __name__ == '__main__':
+    clone_storage_data(sys.argv[1:])

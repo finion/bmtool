@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import settings
 import AzureUtil
 

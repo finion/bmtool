@@ -13,7 +13,7 @@ utctime_format = '%Y-%m-%dT%H:%M:%S'
 schedule_format = '%H:%M:%S'
 date_format = '%Y-%m-%d'
 
-
+# Add comment for test
 def get_saving_money():
     conn = AzureUtil.AzureUtil().connection
 
